@@ -19,25 +19,53 @@ function saveCards(cards) {
 function createCardElement(id, content) {
   const element = document.createElement("textarea");
 
-  element.classList.add("card");
-  element.value = content;
-  element.placeholder = "Empty Sticky card";
+  const card = document.createElement("div");
+  card.classList.add("bank-card");
+  card.innerHTML = `
+    <div class="card-buttons">
+      <button class="edit-card" id="editCard">Edit</button>
+      <button class="delete-card" id="deleteCard">Delete</button>
+    </div>
+    <div class="card-title">Card Title</div>
+    <div class="card-number">
+      <span>XXXXXXXXXXXX</span>
+      <div>Bank Image</div>
+    </div>
+    <div class="card-description">${content}</div>
+  `;
 
-  element.addEventListener("change", () => {
-    updateCard(id, element.value);
-  });
 
-  element.addEventListener("dblclick", () => {
-    const doDelete = confirm(
-      "Are you sure you wish to delete this sticky card?"
-    );
+  // element.addEventListener("change", () => {
+  //   updateCard(id, element.value);
+  // });
+  // const deleteCardButton = document.getElementById("deleteCard")
+  // console.log(deleteCardButton)
+  // deleteCardButton.addEventListener('click', () => {
+  //
+  // })
 
-    if (doDelete) {
-      deleteCard(id, element);
+  card.addEventListener("click", (event) => {
+    // const doDelete = confirm(
+    //   "Are you sure you wish to delete this sticky card?"
+    // );
+    //
+    // if (doDelete) {
+    //   deleteCard(id, element);
+    // }
+    console.log("Clicked")
+
+    if (event.target.matches(".delete-card")) {
+      console.log("Delete card")
+      showDeleteModal(id, card)
     }
   });
 
-  return element;
+  // card.addEventListener("dblclick", () => {
+  //   console.log("Double Clicked")
+  //   showDeleteModal(id, element)
+  // })
+
+  return card;
 }
 
 function addCard() {
@@ -54,7 +82,6 @@ function addCard() {
   saveCards(cards);
 }
 
-
 function updateCard(id, newContent) {
   const cards = getCards();
   const targetCard = cards.filter((card) => card.id === id)[0];
@@ -63,8 +90,8 @@ function updateCard(id, newContent) {
   saveCards(cards);
 }
 
-
 function deleteCard(id, element) {
+  console.log("Delete card")
   const cards = getCards().filter((card) => card.id !== id);
 
   saveCards(cards);
@@ -72,9 +99,17 @@ function deleteCard(id, element) {
 }
 
 
-
-function showDeleteModal(id, element) {
+function showDeleteModal(id, card) {
   const modal = document.createElement("div");
+
+  modal.classList.add("modal")
+  modal.innerHTML = `
+    <div class="modal__inner">
+      <div class="modal__content">Are you sure you want to delete this card?</div>
+      <div class="modal__bottom"></div>
+    </div>
+  `;
+  document.body.appendChild(modal)
 
   const buttons = [
     {
@@ -86,19 +121,12 @@ function showDeleteModal(id, element) {
     {
       label: "Delete",
       onClick: (modal) => {
-        deleteCard(id, element)
+        deleteCard(id, card)
         document.body.removeChild(modal);
       },
     }
   ];
 
-  modal.classList.add("modal")
-  modal.innerHTML = `
-    <div class="modal__inner">
-      <div class="modal__content">Are you sure you want to delete this card?</div>
-      <div class="modal__bottom"></div>
-    </div>
-  `;
   for (const button of buttons) {
     const element = document.createElement("button");
 
