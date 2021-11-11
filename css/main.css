@@ -3,6 +3,16 @@ body {
     background: #009578;
 }
 
+header {
+    display: flex;
+    padding: 20px;
+}
+
+.app-title {
+    font-size: 32px;
+    margin-right: 24px;
+}
+
 #app {
     display: grid;
     grid-template-columns: repeat(auto-fill, 320px);
@@ -56,19 +66,90 @@ body {
    font-family: sans-serif;
 }
 
-.modal__inner {
+.card__modal__inner {
     background: #ffffff;
     width: 100%;
-    max-width: 800px;
+    padding: 24px;
+    max-width: 320px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.card__modal__bottom {
+    display: flex;
+    justify-content: space-between;
+}
+
+.card__form {
+    background-color: blue;
+}
+
+.form-control {
+    margin-bottom: 10px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.form-control label {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.form-control input {
+    border: 2px solid #f0f0f0;
+    border-radius: 4px;
+    display: block;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 10px;
+    width: 90%;
+}
+
+.form-control textarea {
+    border: 2px solid #f0f0f0;
+    border-radius: 4px;
+    display: block;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px;
+    width: 90%;
+}
+
+.form-control input:focus {
+    outline: 0;
+    border-color: #777;
+}
+
+.form-control small {
+    color: #e74c3c;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    visibility: hidden;
+}
+
+.form-control.error small {
+    visibility: visible;
+}
+
+.delete__modal__inner {
+    background: #ffffff;
+    width: 100%;
+    padding: 24px;
+    max-width: 240px;
     overflow: hidden;
     border-radius: 4px;
 }
 
-.modal__bottom {
+.delete__modal__content {
+    margin: 24px 0;
+    text-align: center;
+    font-size: 20px;
+}
+
+.delete__modal__bottom {
     display: flex;
     justify-content: space-between;
-    /*text-align: right;*/
-    padding: 0 var(--gap) var(--gap) var(--gap);
 }
 
 .modal__button {
@@ -83,10 +164,43 @@ body {
     font-size: 18px;
 }
 
-.modal__button:not(:last-child) {
+.delete__modal__button:not(:last-child) {
     margin-right: var(--gap);
 }
 
-.modal__button:hover {
+.delete__modal__button:hover {
     background: #008066;
+}
+
+
+/*simple card styles*/
+.bank-card {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #dddddd;
+    border-radius: 8px;
+}
+
+.card-buttons {
+    display: flex;
+    justify-content: end;
+}
+
+.edit-card {
+    background-color: transparent;
+    border: none;
+}
+
+.delete-card {
+    background-color: transparent;
+    border: none;
+}
+
+.card-title {
+    align-self: center;
+}
+
+.card-number {
+    display: flex;
 }
