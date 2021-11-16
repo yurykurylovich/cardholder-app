@@ -2,11 +2,11 @@ const cardsContainer = document.getElementById("app");
 const addCardButton = document.getElementById("addCard")
 
 getCards().forEach((card) => {
-  const cardElement = createCardElement(card.id, card.content);
+  const cardElement = createCardElement(card);
   cardsContainer.appendChild(cardElement)
 });
 
-addCardButton.addEventListener("click", () => addCard());
+addCardButton.addEventListener("click", () => showCardModal());
 
 function getCards() {
   return JSON.parse(localStorage.getItem("bank-cards") || "[]");
@@ -16,80 +16,47 @@ function saveCards(cards) {
   localStorage.setItem("bank-cards", JSON.stringify(cards));
 }
 
-function createCardElement(id, content) {
-  const element = document.createElement("textarea");
-
+function createCardElement(cardObj) {
   const card = document.createElement("div");
   card.classList.add("bank-card");
   card.innerHTML = `
     <div class="card-buttons">
-      <button class="edit-card" id="editCard"><i class="fas fa-edit"></i></button>
       <button class="delete-card" id="deleteCard"><i class="fas fa-trash"></i></button>
     </div>
-    <div class="card-title">Card Title</div>
+    <div class="card-title">${cardObj.cardTitle}</div>
     <div class="card-number">
-      <span>XXXXXXXXXXXX</span>
-      <div>Bank Image</div>
+      <div id="card__number">**** **** **** ${cardObj.cardNumber.slice(-4)}</div>
+      <i class="fab fa-cc-${cardObj.paymentSystem}"></i>
     </div>
-    <div class="card-description">${content}</div>
+    <div class="card-description">${cardObj.cardDescription}</div>
   `;
 
-
-  // element.addEventListener("change", () => {
-  //   updateCard(id, element.value);
-  // });
-  // const deleteCardButton = document.getElementById("deleteCard")
-  // console.log(deleteCardButton)
-  // deleteCardButton.addEventListener('click', () => {
-  //
-  // })
-
   card.addEventListener("click", (event) => {
-
     if (event.target.matches(".fa-trash")) {
-      showDeleteModal(id, card)
-    } else if (event.target.matches(".fa-edit")) {
-      console.log("EDIT CARD PRESSED")
-      showCardModal(id, card)
+      showDeleteModal(card)
     }
   });
 
   return card;
 }
 
-function addCard(cardInfo = {}) {
+function addCard(cardObject = {}) {
   const cards = getCards();
-  const cardObject = {
-    id: Math.floor(Math.random() * 100000),
-    content: cardInfo.title || '',
-    cardNumber: cardInfo.number || '',
-    cardDescription: cardInfo.description || '',
-  };
-
-  const cardElement = createCardElement(cardObject.id, cardObject.content);
-  cardsContainer.appendChild(cardElement)
-
   cards.push(cardObject);
   saveCards(cards);
+
+  const cardElement = createCardElement(cardObject);
+  cardsContainer.appendChild(cardElement)
 }
 
-function updateCard(id, newContent) {
-  const cards = getCards();
-  const targetCard = cards.filter((card) => card.id === id)[0];
-
-  targetCard.content = newContent;
-  saveCards(cards);
-}
-
-function deleteCard(id, element) {
-  const cards = getCards().filter((card) => card.id !== id);
+function deleteCard(element) {
+  const cards = getCards().filter((card) => card.id !== element.id);
 
   saveCards(cards);
   cardsContainer.removeChild(element);
 }
 
-
-function showDeleteModal(id, card) {
+function showDeleteModal(card) {
   const modal = document.createElement("div");
 
   modal.classList.add("modal")
@@ -111,7 +78,7 @@ function showDeleteModal(id, card) {
     {
       label: "Delete",
       onClick: (modal) => {
-        deleteCard(id, card)
+        deleteCard(card)
         document.body.removeChild(modal);
       },
     }
@@ -131,7 +98,8 @@ function showDeleteModal(id, card) {
   }
 }
 
-function showCardModal(id, card) {
+function showCardModal() {
+
   const modal = document.createElement("div");
   modal.classList.add("modal")
   modal.innerHTML = `
@@ -139,48 +107,58 @@ function showCardModal(id, card) {
       <form id="card__form" class="form">
         <div class="form-control">
           <label for="title">Title</label>
-          <input type="text" placeholder="Card title" id="title"/>
+          <input type="text" placeholder="Card title" id="title">
         </div>
         <div class="form-control">
           <label for="number">Card number</label>
-          <input type="text" placeholder="Description" id="number"/>
+          <input type="text" id="number"/>
+          <small>Error message</small>
+        </div>
+        <div class="form-control">
+          <select name="payment_system" id="payment_system">
+            <option disabled selected value >Choose payment system</option>
+            <option value="visa">Visa</option>
+            <option value="mastercard">Mastercard</option>
+          </select>
           <small>Error message</small>
         </div>
         <div class="form-control">
           <label for="card-description">Description</label>
-          <textarea type="text" placeholder="Description" id="card-description" maxlength="1024"></textarea>
+          <textarea type="text" placeholder="Description" id="description" maxlength="1024"></textarea>
         </div>
-        <div class="card__modal__bottom"></div>
+        <div class="card__modal__bottom">
+          <button id="cancel_btn" type="button" class="modal__button">Cancel</button>
+          <button id="add_btn" type="submit" class="modal__button">Add Card</button>
+        </div>
       </form>
     </div>
   `;
   document.body.appendChild(modal);
 
   const form = document.getElementById('card__form');
-  const title = document.getElementById('title');
-  const number = document.getElementById('number');
-  const description = document.getElementById('description');
+  const titleField = document.getElementById('title');
+  const numberField = document.getElementById('number');
+  const descriptionField = document.getElementById('description');
+  const paymentSystemField = document.getElementById('payment_system')
 
   form.addEventListener('submit', e => {
     e.preventDefault();
 
-    if(checkInputs() === true) {
+    const cardId = setCardId();
+    const cardTitle = titleField.value === '' ? 'Card Title' : titleField.value.trim();
+    const cardNumber = numberField.value.trim();
+    const cardDescription = descriptionField.value === '' ? 'Description' : descriptionField.value.trim();
+    const paymentSystem = paymentSystemField.options[paymentSystemField.selectedIndex].value;
 
+    if (!isCardNumber(cardNumber)) {
+      setErrorFor(numberField, 'Card number should contain 16 numbers');
+    } else if (paymentSystem === '') {
+      setErrorFor(paymentSystemField, 'Choose your payment system');
+    } else {
+      addCard({cardId, cardTitle, cardNumber, cardDescription, paymentSystem})
+      document.body.removeChild(modal);
     }
   });
-
-  function checkInputs() {
-    const titleValue = title.value.trim();
-    const numberValue = number.value.trim();
-    const descriptionValue = description.value.trim();
-
-    if(!isCardNumber(numberValue)) {
-      setErrorFor(number, 'Card number should contain 16 numbers');
-      return false;
-    }
-
-    return true;
-  }
 
   function setErrorFor(input, message) {
     const formControl = input.parentElement;
@@ -189,39 +167,17 @@ function showCardModal(id, card) {
     small.innerText = message;
   }
 
-  function isCardNumber(cardNumber) {
-    return /^([0-9]{16})$/.test(cardNumber)
-  }
+  const cancelButton = document.getElementById("cancel_btn");
+  cancelButton.addEventListener("click", () => {
+    document.body.removeChild(modal);
+  })
+}
 
+// helper methods
+function isCardNumber(cardNumber) {
+  return /^([0-9]{16})$/.test(cardNumber)
+}
 
-
-  const buttons = [
-    {
-      label: "Cancel",
-      onClick: (modal) => {
-        document.body.removeChild(modal);
-      },
-    },
-    {
-      label: "Save",
-      onClick: (modal) => {
-        // deleteCard(id, card)
-        document.body.removeChild(modal);
-      },
-    }
-  ];
-
-  for (const button of buttons) {
-    const element = document.createElement("button");
-
-    element.setAttribute("type", "button");
-    element.classList.add("modal__button");
-    element.textContent = button.label;
-    element.addEventListener("click", () => {
-      button.onClick(modal);
-    });
-
-    modal.querySelector(".card__modal__bottom").appendChild(element);
-  }
-
+function setCardId() {
+  return Math.floor(Math.random() * 1000000);
 }

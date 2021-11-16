@@ -1,6 +1,26 @@
+
+* {
+    font-family: 'Play', sans-serif;
+}
+
 body {
     margin: 0;
-    background: #009578;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 30s ease infinite;
+    height: 100vh;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 header {
@@ -11,11 +31,12 @@ header {
 .app-title {
     font-size: 32px;
     margin-right: 24px;
+    color: white;
 }
 
 #app {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 320px);
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     padding: 24px;
     gap:24px;
 }
@@ -29,7 +50,6 @@ header {
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
     resize: none;
     /*font-family: sans-serif;*/
-    font-size: 16px;
 }
 
 .add-card {
@@ -40,7 +60,7 @@ header {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     font-size: 24px;
-    color: rgba(0, 0, 0, 0.5);
+    color: white;
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -51,7 +71,6 @@ header {
 
 .modal {
    --gap: 15px;
-
    position: fixed;
    top: 0;
    left: 0;
@@ -103,6 +122,13 @@ header {
     font-size: 16px;
     padding: 10px;
     width: 90%;
+}
+
+.form-control select {
+    border: 2px solid #f0f0f0;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 10px;
 }
 
 .form-control textarea {
@@ -178,7 +204,7 @@ header {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    background-color: #dddddd;
+    background-color: white;
     border-radius: 8px;
 }
 
@@ -190,17 +216,56 @@ header {
 .edit-card {
     background-color: transparent;
     border: none;
+    cursor: pointer;
 }
 
 .delete-card {
+    width: 40px;
+    height: 40px;
     background-color: transparent;
+    color: darkslateblue;
+    border-radius: 50%;
     border: none;
+    cursor: pointer;
+}
+
+.delete-card:hover {
+    background-color: gray;
+    color: white;
+}
+
+.fas {
+    font-size: 20px;
+}
+
+.fab {
+    font-size: 30px;
+    color: darkslateblue;
 }
 
 .card-title {
     align-self: center;
+    margin-bottom: 24px;
+    font-size: 24px;
 }
 
 .card-number {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 8px;
+    border: 1px solid darkgray;
+    border-radius: 8px;
+    font-size: 20px;
+}
+
+.card-description {
+    padding: 4px;
+    overflow: auto;
+    word-wrap: break-word;
+    hyphens: auto;
+    text-indent: 16px;
+    max-height: 40px;
+    font-size: 20px;
 }
